@@ -1,6 +1,8 @@
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpackMerge = require("webpack-merge");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require("path");
 
 const modeConfig = (env) => require(`./build-utils/webpack.${env}`)(env);
@@ -12,7 +14,7 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
       mode,
       entry: "./src/index.js",
       output: {
-        filename: "bundle.js",
+        filename: "[name].bundle.[hash].js",
         path: path.resolve(__dirname, "dist"),
       },
       module: {
@@ -29,15 +31,33 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
             ],
           },
           {
-            test: /\.s?css$/,
-            use: ["style-loader", "css-loader", "sass-loader"],
+            test: /\.scss$/,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+              },
+
+              "css-loader",
+              {
+                loader: "postcss-loader",
+                options: {
+                  ident: "postcss",
+                  plugins: [require("autoprefixer")()],
+                },
+              },
+              "sass-loader",
+            ],
           },
         ],
       },
-      output: {
-        filename: "bundle.js",
-      },
-      plugins: [new HtmlWebpackPlugin(), new webpack.ProgressPlugin()],
+      plugins: [
+        new CleanWebpackPlugin(),
+        new MiniCssExtractPlugin({
+          filename: "css/styles.[contenthash].css",
+        }),
+        new HtmlWebpackPlugin(),
+        new webpack.ProgressPlugin(),
+      ],
     },
     modeConfig(mode),
     presetConfig({ mode, presets })
