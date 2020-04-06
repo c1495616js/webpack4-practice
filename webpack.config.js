@@ -1,9 +1,11 @@
 const webpack = require("webpack");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpackMerge = require("webpack-merge");
+const path = require("path");
+
+/** plugins */
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const path = require("path");
 
 const modeConfig = (env) => require(`./build-utils/webpack.${env}`)(env);
 const presetConfig = require("./build-utils/loadPresets");
